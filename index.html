@@ -5,17 +5,35 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contador - Telão</title>
   <style>
-    :root{--bg:#0b0b0d;--fg:#00ffab;--muted:rgba(255,255,255,0.12);--panel:rgba(255,255,255,0.03)}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#060606 0%, #0f0f13 100%);font-family:Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--fg)}
-    .wrap{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .num{font-weight:800;font-size:14vw;line-height:0.9;letter-spacing:-0.02em;text-align:center;text-shadow:0 6px 24px rgba(0,0,0,0.6)}
-    .info{position:fixed;left:12px;bottom:12px;padding:10px 12px;border-radius:10px;background:var(--panel);backdrop-filter:blur(6px);color:var(--fg);font-size:14px}
-    .hint{opacity:0.65;font-size:13px;color:var(--muted);margin-top:6px}
-    .controls{position:fixed;right:12px;top:12px;padding:10px 12px;border-radius:10px;background:var(--panel);font-size:14px;color:var(--fg)}
-    .small{font-size:12px;opacity:0.75;color:var(--muted)}
-    input[type=number]{width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:var(--fg)}
-    button{margin-left:8px;padding:6px 8px;border-radius:6px;border:0;background:rgba(255,255,255,0.04);color:var(--fg);cursor:pointer}
-    @media (max-width:600px){.num{font-size:28vw}}
+    :root {
+      --bg: #0b0b0d;
+      --fg: #00ffab;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: linear-gradient(180deg, #060606 0%, #0f0f13 100%);
+      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--fg);
+    }
+    .wrap {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .num {
+      font-weight: 800;
+      font-size: 14vw;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      text-align: center;
+      text-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
+      user-select: none;
+    }
+    @media (max-width: 600px) {
+      .num { font-size: 28vw; }
+    }
   </style>
 </head>
 <body>
@@ -23,54 +41,31 @@
     <div id="num" class="num">0</div>
   </div>
 
-  <div class="info" id="info">
-    Valor: <span id="val">0</span>
-    <div class="hint">Use <strong>↑</strong>/<strong>↓</strong> para +/-, <strong>+</strong>/<strong>-</strong> altera passo, <strong>R</strong> reseta, <strong>E</strong> editar.</div>
-  </div>
-
-  <div class="controls">
-    Passo: <span id="stepLabel">1</span>
-    <button id="editBtn">Editar (E)</button>
-    <button id="resetBtn">Reset (R)</button>
-    <div class="small">Pressione <strong>F11</strong> para tela cheia</div>
-  </div>
-
 <script>
 (function(){
   const STORAGE_KEY = 'contador_telao_v1';
   const numEl = document.getElementById('num');
-  const valEl = document.getElementById('val');
-  const stepLabel = document.getElementById('stepLabel');
-  const editBtn = document.getElementById('editBtn');
-  const resetBtn = document.getElementById('resetBtn');
-
   let state = { value: 0, step: 1, default: 0 };
 
   function load(){
-    try{
+    try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw) state = Object.assign(state, JSON.parse(raw));
-    }catch(e){console.warn(e)}
+      if (raw) state = Object.assign(state, JSON.parse(raw));
+    } catch(e) { console.warn(e); }
   }
   function save(){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){console.warn(e)}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch(e) { console.warn(e); }
   }
-
   function render(){
-    const v = state.value;
-    numEl.textContent = v.toLocaleString('pt-BR');
-    valEl.textContent = v.toLocaleString('pt-BR');
-    stepLabel.textContent = state.step;
-    document.title = v + ' — Contador';
+    numEl.textContent = state.value.toLocaleString('pt-BR');
+    document.title = state.value + ' — Contador';
   }
-
   function clamp(v){ return v; }
-
   function inc(n){ state.value = clamp(state.value + n); save(); render(); }
   function dec(n){ state.value = clamp(state.value - n); save(); render(); }
   function reset(){ state.value = state.default; save(); render(); }
 
-  // keyboard handling
   window.addEventListener('keydown', (ev) => {
     if(ev.key === 'ArrowUp'){ ev.preventDefault(); inc(state.step); }
     else if(ev.key === 'ArrowDown'){ ev.preventDefault(); dec(state.step); }
@@ -78,43 +73,22 @@
     else if(ev.key === 'e' || ev.key === 'E'){ editValue(); }
     else if(ev.key === '+' || ev.key === '='){ state.step = Math.max(1, state.step * 10); save(); render(); }
     else if(ev.key === '-'){ state.step = Math.max(1, Math.floor(state.step / 10)); save(); render(); }
-    else if(/^[0-9]$/.test(ev.key)){
-      // quick-append digit: if user starts typing digits, open prompt to set exact number
-      // To avoid accidental presses, require Shift (user-friendly) — but also allow direct if user holds Alt
-      if(ev.shiftKey || ev.altKey){
-        // append
-        const digit = ev.key;
-        const newVal = Number(String(Math.abs(state.value)) + digit) * (state.value<0?-1:1);
-        state.value = newVal; save(); render();
-      }
-    }
   });
 
   function editValue(){
     const entry = prompt('Digite o novo valor (números inteiros):', String(state.value));
     if(entry === null) return;
-    const n = Number(entry.replace(/\./g, '').replace(',','')); // simple parse
+    const n = Number(entry.replace(/\./g, '').replace(',', ''));
     if(!Number.isFinite(n)) return alert('Valor inválido');
     state.value = Math.floor(n);
     save(); render();
   }
 
-  editBtn.addEventListener('click', editValue);
-  resetBtn.addEventListener('click', reset);
-
-  // touch / click controls for mobile
-  numEl.addEventListener('click', () => { inc(state.step); });
+  numEl.addEventListener('click', () => inc(state.step));
   numEl.addEventListener('contextmenu', (e) => { e.preventDefault(); dec(state.step); });
 
-  // first load
-  load(); render();
-
-  // expose simple API in console if needed
-  window.ContadorTelao = {
-    get value(){return state.value}, set value(v){state.value = Math.floor(v); save(); render();},
-    inc(n){inc(n||state.step)}, dec(n){dec(n||state.step)}, reset(){reset()}, setStep(s){state.step = Math.max(1,Math.floor(s)); save(); render()}
-  };
-
+  load();
+  render();
 })();
 </script>
 </body>
