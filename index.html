@@ -1,95 +1,89 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Contador - Telão</title>
+  <meta charset="UTF-8">
+  <title>Uma pergunta pra você 💖</title>
   <style>
-    :root {
-      --bg: #0b0b0d;
-      --fg: #00ffab;
-    }
-    html, body {
-      height: 100%;
+    body {
       margin: 0;
-      background: linear-gradient(180deg, #060606 0%, #0f0f13 100%);
-      font-family: Inter, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      color: var(--fg);
-    }
-    .wrap {
-      height: 100%;
+      height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      font-family: Arial, sans-serif;
     }
-    .num {
-      font-weight: 800;
-      font-size: 14vw;
-      line-height: 0.9;
-      letter-spacing: -0.02em;
+
+    .card {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 16px;
       text-align: center;
-      text-shadow: 0 6px 24px rgba(0, 0, 0, 0.6);
-      user-select: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
-    @media (max-width: 600px) {
-      .num { font-size: 28vw; }
+
+    h1 {
+      color: #ff4d6d;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 18px;
+      margin-bottom: 25px;
+    }
+
+    .buttons {
+      position: relative;
+      height: 60px;
+    }
+
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #yes {
+      background: #38b000;
+      color: white;
+      margin-right: 20px;
+    }
+
+    #no {
+      background: #d00000;
+      color: white;
+      position: absolute;
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div id="num" class="num">0</div>
+
+  <div class="card">
+    <h1>Lauriê 💕</h1>
+    <p>Você aceita namorar comigo?</p>
+
+    <div class="buttons">
+      <button id="yes" onclick="accepted()">Sim</button>
+      <button id="no">Não</button>
+    </div>
   </div>
 
-<script>
-(function(){
-  const STORAGE_KEY = 'contador_telao_v1';
-  const numEl = document.getElementById('num');
-  let state = { value: 0, step: 1, default: 0 };
+  <script>
+    const noBtn = document.getElementById("no");
 
-  function load(){
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) state = Object.assign(state, JSON.parse(raw));
-    } catch(e) { console.warn(e); }
-  }
-  function save(){
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-    catch(e) { console.warn(e); }
-  }
-  function render(){
-    numEl.textContent = state.value.toLocaleString('pt-BR');
-    document.title = state.value + ' — Contador';
-  }
-  function clamp(v){ return v; }
-  function inc(n){ state.value = clamp(state.value + n); save(); render(); }
-  function dec(n){ state.value = clamp(state.value - n); save(); render(); }
-  function reset(){ state.value = state.default; save(); render(); }
+    noBtn.addEventListener("mouseover", () => {
+      const x = Math.random() * 200 - 100;
+      const y = Math.random() * 80 - 40;
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
+    });
 
-  window.addEventListener('keydown', (ev) => {
-    if(ev.key === 'ArrowUp'){ ev.preventDefault(); inc(state.step); }
-    else if(ev.key === 'ArrowDown'){ ev.preventDefault(); dec(state.step); }
-    else if(ev.key === 'r' || ev.key === 'R'){ reset(); }
-    else if(ev.key === 'e' || ev.key === 'E'){ editValue(); }
-    else if(ev.key === '+' || ev.key === '='){ state.step = Math.max(1, state.step * 10); save(); render(); }
-    else if(ev.key === '-'){ state.step = Math.max(1, Math.floor(state.step / 10)); save(); render(); }
-  });
-
-  function editValue(){
-    const entry = prompt('Digite o novo valor (números inteiros):', String(state.value));
-    if(entry === null) return;
-    const n = Number(entry.replace(/\./g, '').replace(',', ''));
-    if(!Number.isFinite(n)) return alert('Valor inválido');
-    state.value = Math.floor(n);
-    save(); render();
-  }
-
-  numEl.addEventListener('click', () => inc(state.step));
-  numEl.addEventListener('contextmenu', (e) => { e.preventDefault(); dec(state.step); });
-
-  load();
-  render();
-})();
-</script>
-</body>
-</html>
+    function accepted() {
+      document.body.innerHTML = `
+        <div style="
+          height:100vh;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:linear-gradient(135deg,#ff9a9e,#fad0c4);
