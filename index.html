@@ -1,129 +1,140 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Uma pergunta 💖</title>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lauriê 💜</title>
+  <meta name="theme-color" content="#7c3aed" />
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    .card {
-      width: 90%;
-      max-width: 380px;
-      background: #fff;
-      padding: 28px 22px;
-      border-radius: 18px;
-      text-align: center;
-      box-shadow: 0 12px 30px rgba(0,0,0,.2);
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      color: #ff4d6d;
-      font-size: 28px;
-    }
-
-    p {
-      font-size: 18px;
-      margin-bottom: 28px;
-    }
-
-    .buttons {
-      position: relative;
-      height: 90px;
-    }
-
-    button {
-      width: 120px;
-      padding: 14px;
-      font-size: 18px;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
+      background: radial-gradient(circle at top, #2b1055, #0a001a);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
       touch-action: manipulation;
     }
-
-    #yes {
-      background: #38b000;
-      color: #fff;
+    .card {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
     }
-
-    #no {
-      background: #d00000;
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.8rem;
+      letter-spacing: .5px;
+    }
+    p {
+      opacity: .9;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+    .buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      position: relative;
+      height: 72px; /* mais alto para celular */
+    }
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 16px 30px; /* alvo maior para toque */
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #yes {
+      background: linear-gradient(135deg, #a855f7, #ec4899);
       color: #fff;
+      box-shadow: 0 10px 25px rgba(236,72,153,.4);
+    }
+    #yes:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 14px 35px rgba(236,72,153,.6);
+    }
+    #no {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(40px, -50%);
+      right: 0;
+      background: #111;
+      color: #999;
+    }
+    .result {
+      margin-top: 22px;
+      font-size: 1.1rem;
+      min-height: 1.4em;
+    }
+    .sparkle {
+      animation: pop .6s ease forwards;
+    }
+    @keyframes pop {
+      0% { transform: scale(.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
 <body>
-
   <div class="card">
-    <h1>Lauriê 💕</h1>
-    <p>Você aceita namorar comigo?</p>
+    <h1>Lauriê ✨</h1>
+    <p>
+      Eu queria te fazer uma pergunta simples,
+      mas que vem do fundo do coração.
+      <br><br>
+      Você aceita namorar comigo?
+    </p>
 
-    <div class="buttons">
-      <button id="yes">Sim</button>
+    <div class="buttons" id="buttons">
+      <button id="yes">Sim 💖</button>
       <button id="no">Não</button>
     </div>
+
+    <div class="result" id="result"></div>
   </div>
 
   <script>
-    const noBtn = document.getElementById("no");
-    const yesBtn = document.getElementById("yes");
-    const container = document.querySelector(".buttons");
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+    const result = document.getElementById('result');
+    const container = document.getElementById('buttons');
 
-    function moveNoButton() {
+    // Para CELULAR: o botão NÃO foge ao toque
+    function moveNo() {
       const maxX = container.offsetWidth - noBtn.offsetWidth;
       const maxY = container.offsetHeight - noBtn.offsetHeight;
-
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
-
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
-      noBtn.style.transform = "none";
+      const x = Math.random() * Math.max(0, maxX);
+      const y = Math.random() * Math.max(0, maxY);
+      noBtn.style.transform = `translate(${x}px, ${y}px)`;
     }
 
-    // Mobile: foge ao tentar tocar
-    noBtn.addEventListener("touchstart", moveNoButton);
-    noBtn.addEventListener("mouseover", moveNoButton);
+    noBtn.addEventListener('mouseenter', moveNo);
+    noBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNo();
+    }, { passive: false });
 
-    yesBtn.addEventListener("click", () => {
-      document.body.innerHTML = `
-        <div style="
-          min-height:100vh;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          background:linear-gradient(135deg,#ff9a9e,#fad0c4);
-          font-family:system-ui;
-          text-align:center;
-          padding:20px;
-        ">
-          <h1 style="color:white;font-size:32px;">
-            💖 Eu sabia! 💖<br><br>
-            Agora é oficialmente nós dois 😌
-          </h1>
-        </div>
-      `;
+    // RESPOSTA SEM BACKEND (GitHub Pages)
+    // Opção: abrir WhatsApp com mensagem pronta
+    yesBtn.addEventListener('click', () => {
+      const msg = encodeURIComponent('Eu disse SIM 💜✨');
+      result.textContent = 'Então é um SIM 💜✨ (te mandei a resposta agora)';
+      result.classList.add('sparkle');
+      yesBtn.disabled = true;
+      noBtn.style.display = 'none';
+      setTimeout(() => {
+        // Substitua pelo seu número no formato internacional, ex: 55DDDNÚMERO
+        window.location.href = `https://wa.me/5519996291043?text=${msg}`;
+      }, 600);
     });
   </script>
-
 </body>
 </html>
